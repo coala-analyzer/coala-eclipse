@@ -1,0 +1,6 @@
+[Default]
+files = com.coala.core/**/*.java, com.coala.core.tests/**/*.java
+
+bears = CheckstyleBear
+max_line_length = 90
+use_spaces = True

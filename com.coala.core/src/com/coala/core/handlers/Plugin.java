@@ -1,8 +1,5 @@
 package com.coala.core.handlers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
@@ -21,6 +18,9 @@ import org.eclipse.ui.PlatformUI;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 /**
  * The PluginHandler extends AbstractHandler, an IHandler base class.
  * 
@@ -29,134 +29,131 @@ import org.json.JSONObject;
  */
 public class Plugin extends AbstractHandler {
 
-    /**
-     * The constructor.
-     * 
-     * @throws IOException
-     */
-    public Plugin() {
-    }
+  /**
+   * The constructor.
+   * 
+   * @throws IOException exception
+   */
+  public Plugin() {
+  }
 
-    public Object execute(ExecutionEvent event) throws ExecutionException {
-        IFile file = (IFile) PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().getActivePart()
-                .getSite().getPage().getActiveEditor().getEditorInput()
-                .getAdapter(IFile.class);
-        new RemoveMarkers().execute(event);
+  /**
+   * Execute analysis.
+   */
+  public Object execute(ExecutionEvent event) throws ExecutionException {
+    IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+        .getActivePart().getSite().getPage().getActiveEditor().getEditorInput()
+        .getAdapter(IFile.class);
+    new RemoveMarkers().execute(event);
+    try {
+      runcoalaOnFile(file, "CheckstyleBear");
+    } catch (IOException | InterruptedException ex) {
+      ex.printStackTrace();
+    }
+    return null;
+  }
+
+  /**
+   * Invoke coala-json.
+   * 
+   * @param file
+   *          The IFile to run the analysis on.
+   * @param bear
+   *          The coala Bear to use for analysis.
+   * @throws IOException exception
+   * @throws ExecuteException exception
+   * @throws InterruptedException exception
+   */
+  public void runcoalaOnFile(final IFile file, String bear)
+      throws ExecuteException, IOException, InterruptedException {
+    String path = file.getRawLocation().toOSString();
+    CommandLine cmdLine = new CommandLine("coala-json");
+    cmdLine.addArgument("-f" + path);
+    cmdLine.addArgument("-b" + bear);
+    System.out.println(cmdLine.toString());
+
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(stdout);
+
+    // Asynchronously handle coala-json output
+    DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler() {
+
+      @Override
+      public void onProcessComplete(int exitValue) {
         try {
-            runcoalaOnFile(file, "CheckstyleBear");
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+          processJsonAndMark(stdout.toString(), file);
+        } catch (IOException ex) {
+          ex.printStackTrace();
         }
-        return null;
+      }
+
+      @Override
+      public void onProcessFailed(ExecuteException executeException) {
+        System.out.println("Running coala failed.");
+        executeException.printStackTrace();
+      }
+    };
+
+    // Timeout command execution after 60 seconds.
+    ExecuteWatchdog watchdog = new ExecuteWatchdog(60 * 1000);
+
+    Executor executor = new DefaultExecutor();
+    executor.setWatchdog(watchdog);
+    executor.setExitValue(1);
+    executor.setStreamHandler(pumpStreamHandler);
+    executor.execute(cmdLine, resultHandler);
+  }
+
+  /**
+   * Process the JSON output of coala and add marker for each problem.
+   * 
+   * @param json
+   *          Output of running coala-json.
+   * @param file
+   *          The IFile to add markers on.
+   * @throws IOException exception
+   */
+  public void processJsonAndMark(String json, IFile file) throws IOException {
+    JSONObject jsonObject = new JSONObject(json);
+    JSONArray result = jsonObject.getJSONObject("results").getJSONArray("default");
+    for (int i = 0; i < result.length(); i++) {
+      String message = result.getJSONObject(i).getString("message");
+      String origin = result.getJSONObject(i).getString("origin");
+      int severity = result.getJSONObject(i).getInt("severity");
+      JSONArray affectedCodeArray = result.getJSONObject(i).getJSONArray("affected_code");
+      for (int j = 0; j < affectedCodeArray.length(); j++) {
+        int endLine = affectedCodeArray.getJSONObject(j).getJSONObject("end").getInt("line");
+        createCoolMarker(file, endLine, 3 - severity, message);
+      }
     }
+  }
 
-    /**
-     * Invoke coala-json.
-     * 
-     * @param file
-     *            The IFile to run the analysis on.
-     * @param bear
-     *            The coala Bear to use for analysis.
-     * @throws IOException
-     * @throws ExecuteException
-     * @throws InterruptedException
-     */
-    public void runcoalaOnFile(final IFile file, String bear)
-            throws ExecuteException, IOException, InterruptedException {
-        String path = file.getRawLocation().toOSString();
-        CommandLine cmdLine = new CommandLine("coala-json");
-        cmdLine.addArgument("-f" + path);
-        cmdLine.addArgument("-b" + bear);
-        System.out.println(cmdLine.toString());
-
-        final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-        PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(stdout);
-
-        // Asynchronously handle coala-json output
-        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler() {
-
-            @Override
-            public void onProcessComplete(int exitValue) {
-                try {
-                    processJSONAndMark(stdout.toString(), file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onProcessFailed(ExecuteException executeException) {
-                System.out.println("Running coala failed.");
-                executeException.printStackTrace();
-            }
-        };
-
-        // Timeout command execution after 60 seconds.
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(60 * 1000);
-
-        Executor executor = new DefaultExecutor();
-        executor.setWatchdog(watchdog);
-        executor.setExitValue(1);
-        executor.setStreamHandler(pumpStreamHandler);
-        executor.execute(cmdLine, resultHandler);
+  /**
+   * Creates a problem marker.
+   * 
+   * @param file
+   *          The IFile to add markers on.
+   * @param lineNum
+   *          Line number of marker.
+   * @param flag
+   *          Severity 1 for error, 2 for warning.
+   * @param message
+   *          Problem message on marker.
+   */
+  public void createCoolMarker(IFile file, int lineNum, int flag, String message) {
+    IResource resource = (IResource) file;
+    try {
+      IMarker marker = resource.createMarker("com.coala.core.coolproblem");
+      marker.setAttribute(IMarker.LINE_NUMBER, lineNum);
+      if (flag == 1) {
+        marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+      } else if (flag == 2) {
+        marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+      }
+      marker.setAttribute(IMarker.MESSAGE, message);
+    } catch (CoreException ex) {
+      ex.printStackTrace();
     }
-
-    /**
-     * Process the JSON output of coala and add marker for each problem.
-     * 
-     * @param json
-     *            Output of running coala-json.
-     * @param file
-     *            The IFile to add markers on.
-     * @throws IOException
-     */
-    public void processJSONAndMark(String json, IFile file) throws IOException {
-        JSONObject jsonObject = new JSONObject(json);
-        JSONArray result = jsonObject.getJSONObject("results")
-                .getJSONArray("default");
-        for (int i = 0; i < result.length(); i++) {
-            String message = result.getJSONObject(i).getString("message");
-            String origin = result.getJSONObject(i).getString("origin");
-            int severity = result.getJSONObject(i).getInt("severity");
-            JSONArray affectedCodeArray = result.getJSONObject(i)
-                    .getJSONArray("affected_code");
-            for (int j = 0; j < affectedCodeArray.length(); j++) {
-                int end_line = affectedCodeArray.getJSONObject(j)
-                        .getJSONObject("end").getInt("line");
-                createCoolMarker(file, end_line, 3 - severity, message);
-            }
-        }
-    }
-
-    /**
-     * Creates a problem marker.
-     * 
-     * @param file
-     *            The IFile to add markers on.
-     * @param line_num
-     *            Line number of marker.
-     * @param flag
-     *            Severity 1 for error, 2 for warning.
-     * @param message
-     *            Problem message on marker.
-     */
-    public void createCoolMarker(IFile file, int line_num, int flag,
-            String message) {
-        IResource resource = (IResource) file;
-        try {
-            IMarker marker = resource
-                    .createMarker("com.coala.core.coolproblem");
-            marker.setAttribute(IMarker.LINE_NUMBER, line_num);
-            if (flag == 1) {
-                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-            } else if (flag == 2) {
-                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-            }
-            marker.setAttribute(IMarker.MESSAGE, message);
-        } catch (CoreException e) {
-            e.printStackTrace();
-        }
-    }
+  }
 
 }
