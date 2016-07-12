@@ -24,7 +24,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get -y install python3-pip python-dev
   - sudo pip3 install -U pip setuptools virtualenvwrapper
-  - sudo pip3 install -U coala-bears
+  - sudo pip3 install -U coala-bears --pre
   - sudo apt-get -y install metacity
 
 script: mvn -X clean verify

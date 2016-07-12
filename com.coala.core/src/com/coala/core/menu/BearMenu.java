@@ -2,6 +2,7 @@ package com.coala.core.menu;
 
 import com.coala.core.utils.ExternalUtils;
 
+import org.apache.commons.exec.ExecuteException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
@@ -10,8 +11,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
+import org.json.JSONArray;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class BearMenu extends ContributionItem {
 
@@ -24,7 +27,13 @@ public class BearMenu extends ContributionItem {
 
   @Override
   public void fill(Menu menu, int index) {
-    String[] bears = getBears();
+    ArrayList<String> bears = new ArrayList<>();
+    try {
+      bears = getBears();
+    } catch (IOException ex) {
+      System.out.println("Bear list could not be fetched");
+      ex.printStackTrace();
+    }
 
     for (final String bear : bears) {
       MenuItem menuItem = new MenuItem(menu, SWT.CHECK, index);
@@ -44,81 +53,12 @@ public class BearMenu extends ContributionItem {
     }
   }
 
-  private String[] getBears() {
-    // TODO: Use coala-json to fetch list of bears
-    String[] bears = {"AlexBear",
-                      "AnnotationBear",
-                      "BootLintBear",
-                      "CMakeLintBear",
-                      "CPDBear",
-                      "CPPCheckBear",
-                      "CPPCleanBear",
-                      "CPPLintBear",
-                      "CSSAutoPrefixBear",
-                      "CSSLintBear",
-                      "CSharpLintBear",
-                      "CheckstyleBear",
-                      "ClangASTPrintBear",
-                      "ClangBear",
-                      "ClangCloneDetectionBear",
-                      "ClangComplexityBear",
-                      "ClangFunctionDifferenceBear",
-                      "CoffeeLintBear",
-                      "DartLintBear",
-                      "DockerfileLintBear",
-                      "ESLintBear",
-                      "FormatRBear",
-                      "GNUIndentBear",
-                      "GitCommitBear",
-                      "GoImportsBear",
-                      "GoLintBear",
-                      "GoReturnsBear",
-                      "GoTypeBear",
-                      "GoVetBear",
-                      "GofmtBear",
-                      "HTMLLintBear",
-                      "HaskellLintBear",
-                      "InferBear",
-                      "InvalidLinkBear",
-                      "JSComplexityBear",
-                      "JSHintBear",
-                      "JSONFormatBear",
-                      "JavaPMDBear",
-                      "JuliaLintBear",
-                      "KeywordBear",
-                      "LanguageToolBear",
-                      "LatexLintBear",
-                      "LineCountBear",
-                      "LineLengthBear",
-                      "LuaLintBear",
-                      "MarkdownBear",
-                      "MatlabIndentationBear",
-                      "PEP8Bear",
-                      "PHPLintBear",
-                      "PerlCriticBear",
-                      "ProseLintBear",
-                      "PyCommentedCodeBear",
-                      "PyDocStyleBear",
-                      "PyImportSortBear",
-                      "PyLintBear",
-                      "PyUnusedCodeBear",
-                      "RLintBear",
-                      "RadonBear",
-                      "RuboCopBear",
-                      "RubySyntaxBear",
-                      "SCSSLintBear",
-                      "SQLintBear",
-                      "ScalaLintBear",
-                      "ShellCheckBear",
-                      "SpaceConsistencyBear",
-                      "TSLintBear",
-                      "VHDLLintBear",
-                      "VerilogLintBear",
-                      "VintBear",
-                      "XMLBear",
-                      "YAMLLintBear",
-                      "reSTLintBear"};
-    return bears;
+  private ArrayList<String> getBears() throws ExecuteException, IOException {
+    JSONArray bearList = ExternalUtils.getAvailableBears();
+    ArrayList<String> bearNames = new ArrayList<>();
+    for (int i = 0; i < bearList.length(); i++) {
+      bearNames.add(bearList.getJSONObject(i).getString("name"));
+    }
+    return bearNames;
   }
 }
-  

@@ -134,6 +134,23 @@ public class ExternalUtils {
   }
 
   /**
+   * Get details of all bears that are available on the user's system.
+   * 
+   * @return JSONArray containing details of bears.
+   */
+  public static JSONArray getAvailableBears() throws ExecuteException, IOException {
+    CommandLine cmdLine = new CommandLine("coala-json");
+    cmdLine.addArgument("-B");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(stdout);
+    Executor executor = new DefaultExecutor();
+    executor.setStreamHandler(pumpStreamHandler);
+    executor.execute(cmdLine);
+    JSONArray bearList = new JSONObject(stdout.toString()).getJSONArray("bears");
+    return bearList;
+  }
+
+  /**
    * Process the JSON output of coala and add marker for each problem.
    * 
    * @param json
