@@ -5,9 +5,9 @@
       version="1.0.0.qualifier"
       provider-name="coala">
 
-   <description url="http://coala-analyzer.org/">
+   <description url="http://coala.io/">
       The coala Eclipse plug-in provides static code analysis using coala.
-Visit http://coala-analyzer.org/ for more information.
+Visit http://coala.io/ for more information.
    </description>
 
    <license url="https://www.gnu.org/licenses/agpl.txt">
