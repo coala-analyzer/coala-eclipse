@@ -17,6 +17,10 @@ Drag the above button into your running Eclipse workspace and accept the terms t
 mvn clean verify
 ```
 
+## Usage
+To learn how to use the plug-in please refer to the [Using the plug in]
+(https://github.com/coala-analyzer/coala-eclipse/wiki/Using-the-plug-in) wiki page.
+
 ## Unistall
 1. In Eclipse go to Help-> Installation Details -> Installed Software.
 2. Select coala.
