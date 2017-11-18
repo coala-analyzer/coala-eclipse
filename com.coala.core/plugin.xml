@@ -2,43 +2,22 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            name="Main Category"
-            id="com.coala.core.commands.category">
+   <extension point="org.eclipse.ui.commands">
+      <category name="Main Category" id="com.coala.core.commands.category">
       </category>
-      <command
-            categoryId="com.coala.core.commands.category"
-            id="com.coala.core.commands.runcoalaCommand"
-            name="Run coala Command">
+      <command categoryId="com.coala.core.commands.category" id="com.coala.core.commands.runcoalaCommand" name="Run coala Command">
       </command>
-      <command
-            categoryId="com.coala.core.commands.category"
-            id="com.coala.core.commands.removeMarkersCommand"
-            name="Remove Markers Command">
+      <command categoryId="com.coala.core.commands.category" id="com.coala.core.commands.removeMarkersCommand" name="Remove Markers Command">
       </command>
-      <command
-            categoryId="com.coala.core.commands.category"
-            id="com.coala.core.commands.bearList"
-            name="Bears">
-         <commandParameter
-               id="com.coala.core.commands.bearList.parameters"
-               name="Bear List"
-               optional="false"
-               values="com.coala.core.menu.BearMenu">
+      <command categoryId="com.coala.core.commands.category" id="com.coala.core.commands.bearList" name="Bears">
+         <commandParameter id="com.coala.core.commands.bearList.parameters" name="Bear List" optional="false" values="com.coala.core.menu.BearMenu">
          </commandParameter>
       </command>
    </extension> 
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="com.coala.core.commands.runcoalaCommand"
-            class="com.coala.core.handlers.RuncoafileHandler">
+   <extension point="org.eclipse.ui.handlers">
+      <handler commandId="com.coala.core.commands.runcoalaCommand" class="com.coala.core.handlers.RuncoafileHandler">
       </handler>
-      <handler
-            commandId="com.coala.core.commands.removeMarkersCommand"
-            class="com.coala.core.handlers.RemoveMarkers">
+      <handler commandId="com.coala.core.commands.removeMarkersCommand" class="com.coala.core.handlers.RemoveMarkers">
       </handler>
    </extension>
    <!--
@@ -52,31 +31,16 @@
       </key>
    </extension>
    -->
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-         <menu
-               icon="icons/coala-analyzer.gif"
-               id="com.coala.core.menus.popupMenu"
-               label="Run coala with"
-               mnemonic="o">
-            <dynamic
-              	  class="com.coala.core.menu.BearMenu"
-              	  id="com.coala.core.menu.bearListValues">
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <menu icon="icons/coala-analyzer.gif" id="com.coala.core.menus.popupMenu" label="Run coala with" mnemonic="o">
+            <dynamic class="com.coala.core.menu.BearMenu" id="com.coala.core.menu.bearListValues">
    			</dynamic>
          </menu>
       </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="com.coala.core.toolbar">
-            <command
-                  commandId="com.coala.core.commands.runcoalaCommand"
-                  icon="icons/coala-analyzer.gif"
-                  label="coala"
-                  mode="FORCE_TEXT"
-                  tooltip="Run coala on Project">
+      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar id="com.coala.core.toolbar">
+            <command commandId="com.coala.core.commands.runcoalaCommand" icon="icons/coala-analyzer.gif" label="coala" mode="FORCE_TEXT" tooltip="Run coala on Project">
             </command>
          </toolbar>
       </menuContribution>
@@ -91,9 +55,7 @@
 	</extension>
 	
 	<extension point="org.eclipse.ui.ide.markerResolution">
-      <markerResolutionGenerator
-         markerType="com.coala.core.problem"
-         class="com.coala.core.quickfix.QuickFixer"/>
+      <markerResolutionGenerator markerType="com.coala.core.problem" class="com.coala.core.quickfix.QuickFixer"/>
    </extension>
 	
    
