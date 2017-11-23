@@ -1,6 +1,6 @@
 # coala for Eclipse
 
-[![Build Status](https://travis-ci.org/coala-analyzer/coala-eclipse.svg?branch=master)](https://travis-ci.org/coala-analyzer/coala-eclipse)
+[![Build Status](https://travis-ci.org/coala/coala-eclipse.svg?branch=master)](https://travis-ci.org/coala-analyzer/coala-eclipse)
 
 This package offers a plugin for the Eclipse to use the code analysis software [coala](https://github.com/coala-analyzer/coala) inside the IDE.
 
