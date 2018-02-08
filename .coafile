@@ -5,3 +5,7 @@ ignore = com.coala.core/src/com/coala/core/utils/diff_match_patch.java
 bears = CheckstyleBear
 max_line_length = 90
 use_spaces = True
+
+[xml]
+files = **/*.xml
+bears = XMLBear
