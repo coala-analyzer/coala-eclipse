@@ -29,7 +29,7 @@ public class ExternalUtils {
 
   /**
    * Invoke coala binary.
-   * 
+   *
    * @param file
    *          The IFile to run the analysis on.
    * @param bear
@@ -80,7 +80,7 @@ public class ExternalUtils {
           System.out.println("coala ran successfully.");
         } else if (exitValue == 2 | exitValue == 130) {
           DialogUtils.showErrorDialog("Running coala failed",
-              "Invalid arguments were passed.\nThis is a bug please report this at https://gitter.im/coala-analyzer/coala");
+              "Invalid arguments were passed.\nThis is a bug please report this at https://gitter.im/coala/coala");
         } else if (exitValue == 4) {
           DialogUtils.showErrorDialog("Unsupported Python version",
               "The Python version installed is not supported by coala");
@@ -108,7 +108,7 @@ public class ExternalUtils {
 
   /**
    * Run coala using the .coafile in the project directory.
-   * 
+   *
    * @param path
    *          The path to the project's root.
    * @param project
@@ -145,7 +145,7 @@ public class ExternalUtils {
           System.out.println("coala ran successfully.");
         } else if (exitValue == 2 | exitValue == 130) {
           DialogUtils.showErrorDialog("Running coala failed",
-              "Invalid arguments were passed.\nThis is a bug please report this at https://gitter.im/coala-analyzer/coala");
+              "Invalid arguments were passed.\nThis is a bug please report this at https://gitter.im/coala/coala");
         } else if (exitValue == 4) {
           DialogUtils.showErrorDialog("Unsupported Python version",
               "The Python version installed is not supported by coala");
@@ -174,7 +174,7 @@ public class ExternalUtils {
 
   /**
    * Get details of all bears that are available on the user's system.
-   * 
+   *
    * @return JSONArray containing details of bears.
    */
   public static JSONArray getAvailableBears() throws ExecuteException, IOException {
@@ -214,7 +214,7 @@ public class ExternalUtils {
 
   /**
    * Process the JSON output of coala and add marker for each problem.
-   * 
+   *
    * @param json
    *          Output of running coala.
    * @param file
@@ -256,7 +256,7 @@ public class ExternalUtils {
 
   /**
    * Process the JSON output of coala and add marker for each problem.
-   * 
+   *
    * @param json
    *          Output of running coala.
    * @param project
@@ -300,7 +300,7 @@ public class ExternalUtils {
 
   /**
    * Searches for the given binary in the PATH environmental variable.
-   * 
+   *
    * @param binary
    *          The executable that needs to be checked
    * @return True is the binary is present, false otherwise
@@ -333,7 +333,7 @@ public class ExternalUtils {
 
   /**
    * Creates a problem marker.
-   * 
+   *
    * @param file
    *          The IFile to add markers on.
    * @param lineNum

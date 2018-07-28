@@ -17,7 +17,7 @@ public class DialogUtils {
   public static void installcoalaDialog() {
     URI coalaWebsite = null;
     try {
-      coalaWebsite = new URI("http://coala-analyzer.org");
+      coalaWebsite = new URI("http://coala.io");
     } catch (URISyntaxException ex) {
       ex.printStackTrace();
     }
